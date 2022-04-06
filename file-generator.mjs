@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import fs from 'fs'
+import path from 'path'
 import * as readline from 'node:readline/promises'
 
 /**
@@ -15,15 +16,17 @@ import * as readline from 'node:readline/promises'
 */
 
 const getUserInput = async () => {
+  const projectName = await rl.question('Please enter the name of the project where the boilerplate should be generated:\n');
+
   const fileName = await rl.question('Please enter the name of the file for which boilerplate should be generated:\n');
 
   const functionName = await rl.question('Please enter the name of the function for which boilerplate content should be generated:\n');
 
-  return { fileName, functionName }
+  return { projectName, fileName, functionName }
 }
 
-const generateFilePath = (fileName) => {
-  const filePath = new URL(`./${fileName}`, import.meta.url).pathname
+const generateFilePath = (projectName, fileName) => {
+  const filePath = new URL(`./../../pycharm-projects/cs-162-assignments/project-${projectName}-jawkha/${fileName}`, import.meta.url).pathname
   return filePath
 }
 
@@ -59,13 +62,15 @@ const rl = readline.createInterface({
   output: process.stdout
 })
 
-const { fileName, functionName } = await getUserInput()
-const filePath = generateFilePath(fileName)
+const { projectName, fileName, functionName } = await getUserInput()
+const filePath = generateFilePath(projectName, fileName)
 const content = generateFileContent(functionName)
 createFile(filePath, content)
 
+const absoluteFilePath = path.resolve('./../../pycharm-projects/cs-162-assignments', `project-${projectName}-jawkha/`)
+
 rl.on('close', () => {
-  console.log(`The required file ${fileName} with boilerplate content has been created.`)
+  console.log(`The required file ${fileName} with boilerplate content has been created as ${absoluteFilePath}`)
   process.exit(0)
 })
 
